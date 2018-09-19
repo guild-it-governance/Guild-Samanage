@@ -5,6 +5,9 @@ Paul Mealus
 This script checks the site/dept of its owner. Then sets the
 computer's site/dept to the same.
 
+Future State:
+Tie this into the hardware_owner_mapper script.
+
 '''
 #imports
 import requests

@@ -14,7 +14,8 @@ into the "owner" field.
 Future State:
 Skip the csv and request a list of all assets. For each asset check if owner
 exists, if not map the user to an email address and input the address
-in owner field. Add a try except block for error handling.
+in owner field. Add a try except block for error handling. Tie this into the
+computer_location_mapper script
 '''
 import csv
 import requests
