@@ -5,13 +5,16 @@ This script intakes hw_map.csv with the asset's id (exported from samanage) and
 active directory or workgroup username.
 The csv should be structured like this:
 
-Col 1: Samanage asset ID (7 digits), Col2: Username, Col3: Email Address 
+Col 1: Samanage asset ID (7 digits), Col2: Username, Col3: Email Address
+
+Then it inputs the email address (since email is a unique owner identifier
+into the "owner" field.
 
 
 Future State:
 Skip the csv and request a list of all assets. For each asset check if owner
 exists, if not map the user to an email address and input the address
-in owner field
+in owner field. Add a try except block for error handling.
 '''
 import csv
 import requests
