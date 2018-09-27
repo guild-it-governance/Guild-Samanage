@@ -63,7 +63,7 @@ def lease_add(lease_names):
     contracts = []
     for i in range(0,len(r.json())):
         contracts.append(r.json()[i]['name'])
-    print(contracts)
+
 
 
 
