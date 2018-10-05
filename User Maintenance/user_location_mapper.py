@@ -31,5 +31,4 @@ with open("user_loc_map.csv", "r", newline="") as f:
             "custom_fields_values":{"custom_fields_value":[{"name":"Cost Center Number", "value":row[4]}]}}},
             headers={'X-Samanage-Authorization': 'Bearer '+ api_token})
             print(row[0] + " " + row[1] + " Updated")
-        
-        
+

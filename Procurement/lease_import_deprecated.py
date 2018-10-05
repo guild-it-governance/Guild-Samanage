@@ -18,7 +18,7 @@ import csv
 import os
 
 #Global Variables
-api_token = "cG1lYWx1c0BndWlsZG1vcnRnYWdlLm5ldA==:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjozMTExMTI1LCJnZW5lcmF0ZWRfYXQiOiIyMDE4LTA1LTAzIDA0OjI5OjE1In0.4iOXvrN0htmYDp-gjET3BoAAOi0mDR_TVLdNQPWRyzmifqJ4hgzad1o8tRFMZYgveQmYZ6SKxVwO2PG90tLtDg"
+api_token = ""
 sn = 'CV8ZM12'
 
 #Functions
@@ -51,7 +51,7 @@ def sn_checker(x, sn):
 
 def lease_names():
     dir = os.listdir()
-    dir.remove('lease_import.py')
+    dir.remove()
     leases = []
     for i in dir:
         leases.append(i[0:-4])
