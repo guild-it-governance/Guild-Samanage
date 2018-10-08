@@ -20,7 +20,7 @@ computer_location_mapper script
 import csv
 import requests
 
-api_token = 'INSERT TOKEN HERE'
+api_token = input("Paste API token: ")
 
 with open ('hw_map.csv', newline='') as f:
     rdr = csv.reader(f)

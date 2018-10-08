@@ -14,7 +14,7 @@ import requests
 
 
 #variables
-api_token = 'INSERT TOKEN HERE'
+api_token = input("Paste API token: ")
 
 #functions
 

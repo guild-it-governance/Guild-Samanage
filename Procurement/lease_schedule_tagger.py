@@ -9,7 +9,7 @@ import requests
 import time
 
 
-api_token = "INSERT TOKEN"
+api_token = input("Paste API token: ")
 
 def hardware_list():
     '''

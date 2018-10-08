@@ -18,8 +18,7 @@ import csv
 import os
 
 #Global Variables
-api_token = ""
-sn = 'CV8ZM12'
+api_token = input("Paste API token: ")
 
 #Functions
 def hardware_list():
