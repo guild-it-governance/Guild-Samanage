@@ -1,30 +1,69 @@
-'''
-Paul Mealus
+"""
+Author: Paul Mealus
 
-This script intakes hw_map.csv with the asset's id (exported from samanage) and
-active directory or workgroup username.
-The csv should be structured like this:
-
-Col 1: Samanage asset ID (7 digits), Col2: Username, Col3: Email Address
-
-Then it inputs the email address (since email is a unique owner identifier
-into the "owner" field.
+v1 09/7/2018
+v2 11/7/2018 - Rebuild to include function that gets href for every hardware item
 
 
-Future State:
-Skip the csv and request a list of all assets. For each asset check if owner
-exists, if not map the user to an email address and input the address
-in owner field. Add a try except block for error handling. Tie this into the
-computer_location_mapper script
-'''
-import csv
+"""
+
+
+import time
 import requests
 
 api_token = input("Paste API token: ")
 
-with open ('hw_map.csv', newline='') as f:
-    rdr = csv.reader(f)
-    for row in rdr:
-        url = 'https://api.samanage.com/hardwares/'+row[0]+'.json'
-        r = requests.put(url, json={"hardware":{"owner":{"email":row[2]}}}, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-        print(row[0] + " " + str(r.status_code) + " " + r.reason)
+
+def hardware_hrefs():
+    """
+    Gets the hrefs for every computer item in the hardware module
+    """
+    hardware_url = "https://api.samanage.com/hardwares.json"
+    print("Requesting list of all computer inventory... please wait")
+    r = requests.get(hardware_url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+    pages = int(r.headers['X-Total-Pages'])
+    current_page = 1
+    href_list = []
+    while current_page <= pages:
+        print('Gathering links from page# ' + str(current_page) + " of " + str(pages))
+        page_url = hardware_url + "?page=" + str(current_page)
+        r = requests.get(page_url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+        for i in range(0,len(r.json())):
+            href_list.append(r.json()[i]['href'])
+        current_page += 1
+        time.sleep(1)
+    return href_list
+
+
+def hardware_owner_mapper(r):
+    """
+    Grabs the username and tries to put it into the owner field, r is a request.get return object
+    """
+
+    url = r.json()['href']
+    owner = r.json()['username'] + "@guildmortgage.net"
+    requests.put(url, json={
+                            "hardware": {
+                                "owner": {
+                                            "email": owner,
+                                         }
+                                        }
+                            }
+                 , headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+
+
+
+print('\n\nPreparing a request to gather links for all Computer Inventory.\n')
+href_list = hardware_hrefs()
+
+
+for i in href_list:
+    try:
+        r = requests.get(i, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+        print("Updating owner of : {}".format(r.json()['serial_number']))
+        hardware_owner_mapper(r)
+        time.sleep(0.5)
+    except TypeError:
+        print("Something is wrong with the username for {}".format(i))
+
+print('\n\nDone updating owners.')
