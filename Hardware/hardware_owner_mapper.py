@@ -1,8 +1,9 @@
 """
 Author: Paul Mealus
 
-v1 09/7/2018
-v2 11/7/2018 - Rebuild to include function that gets href for every hardware item
+v1 09/7/2018 - Initial build
+v2 11/7/2018 - Rebuild to include function that gets href for every hardware item - PJM
+v3 11/28/2018 - Combined with location mapper - PJM
 
 
 """
@@ -52,6 +53,17 @@ def hardware_owner_mapper(r):
                  , headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
 
 
+def loc_mapper(r):
+    """
+    If an owner exists, try to update the computer's record to match the owner's site/dept.
+    Do nothing if the owner is not mapped. r is a request.get return object
+    """
+    url = r.json()['href']
+    dept = r.json()['owner']['department']['name']
+    site = r.json()['owner']['site']['name']
+    requests.put(url, json={"hardware":{"site":{"name":site},"department":{"name":dept}}}, headers={'X-Samanage-Authorization': 'Bearer '+ api_token})
+    print(url + " Updated")
+
 
 print('\n\nPreparing a request to gather links for all Computer Inventory.\n')
 href_list = hardware_hrefs()
@@ -60,10 +72,11 @@ href_list = hardware_hrefs()
 for i in href_list:
     try:
         r = requests.get(i, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-        print("Updating owner of : {}".format(r.json()['serial_number']))
+        print("Updating owner and location of : {}".format(r.json()['serial_number']))
         hardware_owner_mapper(r)
+        loc_mapper(r)
         time.sleep(0.5)
-    except TypeError:
-        print("Something is wrong with the username for {}".format(i))
+    except (TypeError, KeyError):
+        print("Something is wrong with the naming convention for {}, continuing".format(i))
 
 print('\n\nDone updating owners.')
