@@ -13,6 +13,7 @@ start_time = time.asctime()
 
 api_token = input("Paste API token: ")
 
+
 site_list = []
 dept_list = []
 inact_dept_list = []
@@ -85,11 +86,14 @@ try:
             continue
 
     print("\n" * 5)
-    print("Done with site and departments, now updating users\n")
+    print("Done with site and departments\n")
 
 except:
     print("Timeout error... continuing")
     time.sleep(0.5)
+
+
+print("Working on Employee Data...")
 
 with open("Business Continuity - Employee Information.csv", "r", newline="") as f:
     reader = csv.reader(f)
@@ -109,7 +113,7 @@ with open("Business Continuity - Employee Information.csv", "r", newline="") as 
                 url2 = "https://api.samanage.com/users/" + str(r.json()[0]['id']) + ".json"
                 r2 = requests.put(
                     url2, json={"user": {"department": {"name": dept}, "site": {"name": site},
-                                         "reports_to":{"email":mgr},
+                                         #"reports_to":{"email":mgr},
                                          "custom_fields_values": {
                                              "custom_fields_value": [
                                                  {"name": "Employee ID", "value": row[1]},
