@@ -29,8 +29,8 @@ def main():
         if site not in site_list:
             site_list.append(site)
 
-    #dept_adder(dept_list, api_token)
-    #site_adder(site_list, api_token)
+    dept_adder(dept_list, api_token)
+    site_adder(site_list, api_token)
     user_updater(user_list, api_token)
 
     stop_time = time.asctime()
