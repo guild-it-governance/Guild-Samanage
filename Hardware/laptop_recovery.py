@@ -6,15 +6,15 @@ disabled user/laptop recovery
 
 """
 
-#Imports
+# Imports
 import requests
 import time
 
-#Global
+# Global
 api_token = input("Paste API token: ")
 reqemail = input("Enter email of the requester :")
 
-#Functions
+# Functions
 
 
 def get_inactive_users():

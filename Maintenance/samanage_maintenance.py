@@ -1,6 +1,6 @@
 """
-Paul Mealus
-v2 10/8/2018
+by Paul Mealus
+v2 10/8/2018 - Logic revision
 v3 11/6/2018 - Added the ability to update supervisor
 v4 1/8/2018 - Refactor for simplicity/flow and changed input csv file
 
@@ -124,10 +124,10 @@ def site_adder(site_list, api_token):
 def user_updater(user_list, api_token):
     print("\n\n\n\nUpdating Users")
     for i in user_list:
-        url = "https://api.samanage.com/users.json?email=" + i['Email']
-        r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-
         try:
+            url = "https://api.samanage.com/users.json?email=" + i['Email']
+            r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+
             if len(r.json()) == 1:
 
                 dept = i['Cost Center#'] + ' - ' + i['Cost Center']
@@ -145,13 +145,24 @@ def user_updater(user_list, api_token):
                         headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
                 print("Status {}: {} has been updated.".format(r2.status_code, i['Email']))
                 time.sleep(0.5)
+
             else:
                 print('WARNING {} {} {} is not in Samanage, check user info and Okta'.format(
                     i['Email'], i['First Name'], i['Last Name']))
+                time.sleep(0.5)
 
         except TypeError:
             print('WARNING TypeError received for {} {}'.format(i['email'], i['EE#']))
+        except requests.Timeout:
+            print('WARNING ConnectionError received for {} {}'.format(i['email'], i['EE#']))
+        except TimeoutError:
+            print('WARNING TimeoutError received for {} {}'.format(i['email'], i['EE#']))
 
 
 if __name__ == '__main__':
     main()
+
+
+# TODO more consistent "NoneType"
+# TODO add title
+# TODO functionality for termed users
