@@ -23,16 +23,28 @@ def serial_checker(dev_list, api_token):
     # Check if serial exists in samanage
     in_list = []
     for i in dev_list:
-        try:
-            sn = i['Serial Number']
-            url = "https://api.samanage.com/hardwares.json?report_id=9122646&applied=true&serial_number%5B%5D=" + sn
-            r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-            time.sleep(0.5)
-            if len(r.json()) == 1:
-                in_list.append(r.json()[0]['href'])
-                print("{} added to update list".format(sn))
-        except TimeoutError:
-            print("TimeoutError: Passing")
+        if not i['Serial Number']:
+            pass
+        else:
+            try:
+                sn = i['Serial Number']
+                url = "https://api.samanage.com/hardwares.json?report_id=9122646&applied=true&serial_number%5B%5D=" + sn
+                print("Requesting {}".format(i))
+                r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+                time.sleep(0.5)
+                if len(r.json()) == 1:
+                    in_list.append(r.json()[0]['href'])
+                    print("{} added to update list".format(sn))
+
+            except TimeoutError:
+                print("TimeoutError: Passing")
+            except ConnectionAbortedError:
+                print("ConnectionAbortedError: Passing")
+            except ConnectionError:
+                print("ConnectionError: Passing")
+            except Exception as err:
+                print(err)
+
     return in_list
 
 
