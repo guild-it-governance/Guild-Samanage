@@ -9,60 +9,48 @@ import requests
 import time
 
 
-api_token = input("Paste API token: ")
-
-def hardware_list():
-    '''
-    Return a list of every computer object
-    '''
-    hardware_url = "https://api.samanage.com/hardwares.json"
-    print("Requesting list of all computer inventory... please wait")
-    r = requests.get(hardware_url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-    pages = int(r.headers['X-Total-Pages'])
-    current_page = 1
-    obj_list = []
-    while current_page <= pages:
-        print('Gathering computer items from page# ' + str(current_page) + " of " + str(pages))
-        page_url = hardware_url + "?page=" + str(current_page)
-        r = requests.get(page_url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-        for i in range(0, len(r.json())):
-            obj_list.append(r.json()[i])
-        current_page += 1
-        time.sleep(1)
-    return obj_list
+def tagger(href_list, sch_num, api_token):
+    for i in href_list:
+        r = requests.put(i,
+                     json={"hardware": {"custom_fields_values": {
+                         "custom_fields_value": [{"name": "Lease Schedule #", "value": sch_num}]}}},
+                     headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+        time.sleep(0.5)
+        print(r.status_code, i, "Updated")
 
 
-def tagger(obj_list, sn):
-    in_samanage = False
-    for i in range(0, len(obj_list)):
-        try:
-            if sn in obj_list[i].values():
-                requests.put(obj_list[i]['href'],
-                             json={"hardware": {"custom_fields_values": {
-                                 "custom_fields_value": [{"name": "Lease Schedule #", "value": sch_num}]}}},
-                             headers={'X-Samanage-Authorization': 'Bearer '+ api_token})
-                in_samanage = True
-                time.sleep(.5)
-                break
-            else:
-                pass
-        except (TypeError, ValueError, TimeoutError):
-            print("TypeError, ValueError, TimeoutError Detected: " + sn)
-    if in_samanage:
-        print(sn + " updated")
-    else:
-        print(sn + " not in Samanage")
+def serial_checker(dev_list, api_token):
+    # Check if serial exists in samanage
+    in_list = []
+    for i in dev_list:
+        sn = i['Serial Number']
+        url = "https://api.samanage.com/hardwares.json?report_id=9122646&applied=true&serial_number%5B%5D=" + sn
+        r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
+        time.sleep(0.5)
+        if len(r.json()) == 1:
+            in_list.append(r.json()[0]['href'])
+            print("{} added to update list".format(sn))
+    return in_list
 
 
-sch_num = input("\n\nWhich lease schedule would you like to tag?: ")
+def csv_reader(name):
+    # Return the Samanage Export CSV in dictionary format
+    with open(name + ".csv", 'r') as fin:
+        reader = csv.DictReader(fin)
+        dev_list = []
+        for row in reader:
+            dev_list.append(row)
 
-obj_list = hardware_list()
+    return dev_list
 
-print("=" * 35)
-print("Done collecting hardware, now processing lease schedule " + sch_num)
-print("=" * 35)
 
-with open("SCHE " + sch_num + '.csv', newline='') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        tagger(obj_list, row[1])
+def main():
+    api_token = input("Paste API token: ")
+    sch_num = input("Which lease schedule would you like to tag?: ")
+    dev_list = csv_reader(sch_num)
+    href_list = serial_checker(dev_list, api_token)
+    tagger(href_list, sch_num, api_token)
+
+
+if __name__ == '__main__':
+    main()
