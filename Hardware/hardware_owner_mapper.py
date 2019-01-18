@@ -102,6 +102,8 @@ def main():
         except (TypeError, KeyError):
             print("ERROR site/loc data is incorrect for {}, continuing".format(i))
 
+    print("\nAll Done.")
+
 
 if __name__ == '__main__':
     main()
