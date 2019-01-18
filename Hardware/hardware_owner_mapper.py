@@ -11,6 +11,7 @@ v4 1/17/2019 - Refactor and clean up flow by adding main method
 
 import time
 import requests
+import csv
 
 
 def hardware_hrefs(api_token):
@@ -73,36 +74,36 @@ def loc_mapper(r, api_token):
     print(url + " Updated")
 
 
+# def exceptions_to_csv(exceptions_list):
+#     with open('exceptions.csv', mode='w') as fout:
+#         writer = csv.writer(fout)
+#         for i in exceptions_list:
+#             writer.writerow(
+#                 i['serial_number'], i['username'], i['owner'], i['site'], i['department'])
+
+
 def main():
     api_token = input("Paste API token: ")
     print('\n\nPreparing a request to gather links for all Computer Inventory.\n')
     href_list = hardware_hrefs(api_token)
+    exceptions = []
     for i in href_list:
         try:
             r = requests.get(i, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
             print("Updating owner and location of : {}".format(r.json()['serial_number']))
             hardware_owner_mapper(r, api_token)
+
+        except (TypeError, KeyError):
+            print("ERROR owner data is incorrect for {}, continuing".format(i))
+
+        try:
             loc_mapper(r, api_token)
 
         except (TypeError, KeyError):
-            print("Data or username incorrect for {}, continuing".format(i))
+            print("ERROR site/loc data is incorrect for {}, continuing".format(i))
 
 
 if __name__ == '__main__':
     main()
 
-
-
-
-
-#for i in href_list:
-#    try:
-#        r = requests.get(i, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
-#        print("Updating owner and location of : {}".format(r.json()['serial_number']))
-#        hardware_owner_mapper(r)
-#        loc_mapper(r)
-#        time.sleep(0.5)
-#    except (TypeError, KeyError):
-#        print("Data or username incorrect for {}, continuing".format(i))
-#
-#print('\n\nDone updating owners.')
+# TODO Kick out exceptions to a CSV
