@@ -95,13 +95,17 @@ def main():
 
         except (TypeError, KeyError):
             print("ERROR owner data is incorrect for {}, continuing".format(i))
+            exceptions.append((i['serial_number'], i['username'], i['owner'], i['site'], i['department']))
 
         try:
             loc_mapper(r, api_token)
 
         except (TypeError, KeyError):
             print("ERROR site/loc data is incorrect for {}, continuing".format(i))
+            exceptions.append((i['serial_number'], i['username'], i['owner'], i['site'], i['department']))
 
+    for i in exceptions:
+        print(i)
     print("\nAll Done.")
 
 
