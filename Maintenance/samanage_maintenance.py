@@ -9,34 +9,60 @@ v4 1/8/2018 - Refactor for simplicity/flow and changed input csv file
 import requests
 import csv
 import time
+import datetime
 
 
 def main():
     # Overall App flow control
-    api_token = input("Paste API token: ")
+    #api_token = input("Paste API token: ")
+    date_run = input("Last date run? YYYY-M-DD: ")
+    date_run = date_run.split("-")
+    date_run = datetime.date(int(date_run[0]), int(date_run[1]), int(date_run[2]))
+
     start_time = time.asctime()
     user_list = csv_reader()
     site_list = []
     dept_list = []
 
-    for i in user_list:
+    #for i in user_list:
+    #
+    #    dept = dept_checker(i)
+    #    if dept not in dept_list:
+    #        dept_list.append(dept)
+    #
+    #    site = site_checker(i)
+    #    if site not in site_list:
+    #        site_list.append(site)
+    #
+    #dept_adder(dept_list, api_token)
+    #site_adder(site_list, api_token)
+    #user_updater(user_list, api_token)
+    termlist = termed_user_list(date_run, user_list)
+    term_ticketer(termlist)
 
-        dept = dept_checker(i)
-        if dept not in dept_list:
-            dept_list.append(dept)
-
-        site = site_checker(i)
-        if site not in site_list:
-            site_list.append(site)
-
-    dept_adder(dept_list, api_token)
-    site_adder(site_list, api_token)
-    user_updater(user_list, api_token)
+    for i in termlist:
+        print(i['Email'], i['First Name'], i['Last Name'], i['Term Date'], i['Region'])
 
     stop_time = time.asctime()
     print("Start Time: " + start_time)
     print("Stop Time: " + stop_time)
     print("======Script Complete======")
+
+
+def termed_user_list(last_date_run, user_list):
+    last_date_run = last_date_run
+    term_user_list = []
+    for i in user_list:
+        if not i['Term Date']:
+            continue
+        else:
+            term_dt = i['Term Date'].split("/")
+            term_dt = datetime.date(int(term_dt[2][:4]), int(term_dt[0]), int(term_dt[1]))
+            if term_dt > last_date_run:
+                term_user_list.append(i)
+            else:
+                continue
+    return term_user_list
 
 
 def csv_reader():
