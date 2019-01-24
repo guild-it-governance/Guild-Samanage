@@ -38,8 +38,8 @@ def main():
     dept_adder(dept_list, api_token)
     site_adder(site_list, api_token)
     user_updater(user_list, api_token)
-    term_list = termed_user_list(date_run, user_list)
-    term_ticketer(term_list, api_token)
+    #term_list = termed_user_list(date_run, user_list)
+    #term_ticketer(term_list, api_token)
 
     stop_time = time.asctime()
     print("Start Time: " + start_time)
@@ -249,12 +249,8 @@ def user_updater(user_list, api_token):
                     i['Email'], i['First Name'], i['Last Name']))
                 time.sleep(0.5)
 
-        except TypeError:
-            print('WARNING TypeError received for {} {}'.format(i['email'], i['EE#']))
-        except requests.Timeout:
-            print('WARNING ConnectionError received for {} {}'.format(i['email'], i['EE#']))
-        except TimeoutError:
-            print('WARNING TimeoutError received for {} {}'.format(i['email'], i['EE#']))
+        except Exception as e:
+            print('WARNING error received for {} {}'.format(i['email'], i['EE#']))
 
 
 if __name__ == '__main__':
