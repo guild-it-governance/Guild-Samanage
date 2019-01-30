@@ -38,8 +38,8 @@ def main():
     dept_adder(dept_list, api_token)
     site_adder(site_list, api_token)
     user_updater(user_list, api_token)
-    #term_list = termed_user_list(date_run, user_list)
-    #term_ticketer(term_list, api_token)
+    term_list = termed_user_list(date_run, user_list)
+    term_ticketer(term_list, api_token)
 
     stop_time = time.asctime()
     print("Start Time: " + start_time)
@@ -55,8 +55,8 @@ def termed_user_list(last_date_run, user_list):
         if not i['Term Date']:
             continue
         else:
-            term_dt = i['Term Date'].split("/")
-            term_dt = datetime.date(int(term_dt[2][:4]), int(term_dt[0]), int(term_dt[1]))
+            term_dt = i['Term Date'].split("-")
+            term_dt = datetime.date(int(term_dt[0]), int(term_dt[1]), int(term_dt[2][:2]))
             if term_dt > last_date_run:
                 term_user_list.append(i)
             else:
@@ -68,6 +68,7 @@ def pc_check(email, api_token):
     """Given a user email, check if they have laptops"""
     comp_list = []
     try:
+        print("Checking for laptops...")
         url = 'https://api.samanage.com/users.json?email=' + email
         r = requests.get(url, headers={'X-Samanage-Authorization': 'Bearer ' + api_token})
         time.sleep(0.5)
@@ -88,7 +89,8 @@ def term_ticketer(term_list, api_token):
 
     region_id = {
         "Midwest Region": 3959517,
-        "Desktop Support": 3440094,
+        "Corporate Office": 3440094,
+        "Direct Lending Region": 3440094,
         "Mountain West Region": 3959515,
         "Northern CA": 3959509,
         "Northwest Region": 3959534,
